@@ -18,7 +18,11 @@ connector-shopify
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[shopify_connector](shopify_connector/) | 19.0.1.0.0 |  | GraphQL-first Shopify commerce synchronization
 
 [//]: # (end addons)
 
