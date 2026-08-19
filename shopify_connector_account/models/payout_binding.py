@@ -155,10 +155,13 @@ class ShopifyPayoutTransaction(models.Model):
     test = fields.Boolean(readonly=True)
     raw_payload = fields.Json(readonly=True)
 
-    _instance_transaction_unique = models.Constraint(
-        "UNIQUE(instance_id, shopify_id)",
-        "A Shopify Payments transaction can only be imported once.",
-    )
+    _sql_constraints = [
+        (
+            "instance_transaction_unique",
+            "UNIQUE(instance_id, shopify_id)",
+            "A Shopify Payments transaction can only be imported once.",
+        )
+    ]
 
     @api.constrains(
         "instance_id",

@@ -104,6 +104,10 @@ class ShopifyInstancePayoutSync(models.Model):
             if not page_info.get("hasNextPage"):
                 return account, records
             after = page_info.get("endCursor")
+            if not after:
+                raise ShopifyError(
+                    self.env._("Shopify returned an invalid payments page cursor.")
+                )
 
     def _job_import_payouts(self, date_from=False, date_to=False):
         self = self.sudo()
@@ -140,8 +144,20 @@ class ShopifyInstancePayoutSync(models.Model):
         self.shopify_payments_state = "enabled"
         imported = self.env["shopify.payout"]
         for payload in payloads:
-            payout = self._upsert_payout(normalize_payout(payload))
-            self._import_payout_transactions(payout)
+            try:
+                with self.env.cr.savepoint():
+                    payout = self._upsert_payout(normalize_payout(payload))
+                    self._import_payout_transactions(payout)
+            except ShopifyUserError as exc:
+                self.shopify_payments_state = "unavailable"
+                self._write_log(
+                    entity="payout",
+                    direction="import",
+                    level="info",
+                    message=self.env._("Shopify Payments is unavailable: %s", exc),
+                    record=self,
+                )
+                return imported.ids
             imported |= payout
         try:
             self._import_disputes(date_from, date_to)

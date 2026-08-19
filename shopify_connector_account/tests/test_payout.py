@@ -2,11 +2,13 @@ from unittest.mock import Mock, patch
 
 from odoo import SUPERUSER_ID
 from odoo.fields import Command
+from odoo.tests import tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.shopify_connector.models.order_sync import ShopifyOrderImportError
 
 
+@tagged("post_install", "-at_install")
 class TestShopifyPayoutAccounting(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls):

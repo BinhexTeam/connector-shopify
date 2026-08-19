@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
 
-from odoo.addons.shopify_connector.lib.client import ShopifyUserError
+from odoo.addons.shopify_connector.lib.client import ShopifyError, ShopifyUserError
 from odoo.addons.shopify_connector_account.lib.payout import (
     PayoutPlanningError,
     normalize_payout,
@@ -120,6 +120,35 @@ class TestShopifyPayoutSync(TransactionCase):
                 self.instance._payments_page("query", {}, "payouts"), (None, [])
             )
 
+    def test_payments_page_rejects_missing_cursor(self):
+        for page_info in (
+            {"hasNextPage": True},
+            {"hasNextPage": True, "endCursor": None},
+            {"hasNextPage": True, "endCursor": ""},
+        ):
+            with self.subTest(page_info=page_info):
+                client = Mock()
+                client.execute.side_effect = [
+                    {
+                        "shopifyPaymentsAccount": {
+                            "payouts": {"nodes": [], "pageInfo": page_info}
+                        }
+                    }
+                ]
+                with (
+                    patch.object(
+                        type(self.instance),
+                        "_shopify_client",
+                        autospec=True,
+                        return_value=client,
+                    ),
+                    self.assertRaisesRegex(
+                        ShopifyError, "invalid payments page cursor"
+                    ),
+                ):
+                    self.instance._payments_page("query", {}, "payouts")
+                client.execute.assert_called_once()
+
     def test_import_payouts_handles_availability_and_upserts(self):
         self.instance.active = False
         self.assertEqual(self.instance._job_import_payouts(), [])
@@ -191,6 +220,64 @@ class TestShopifyPayoutSync(TransactionCase):
         updated = self.instance._upsert_payout(updated_values)
         self.assertEqual(updated, payout)
         self.assertEqual(updated.payout_status, "SCHEDULED")
+
+    def test_transaction_access_denied_preserves_completed_payouts(self):
+        payloads = [
+            {
+                "id": f"gid://shopify/ShopifyPaymentsPayout/{payout_id}",
+                "legacyResourceId": payout_id,
+                "status": "PAID",
+                "net": {"amount": "0.00", "currencyCode": self.currency.name},
+            }
+            for payout_id in ("201", "202")
+        ]
+        with (
+            patch.object(
+                type(self.instance),
+                "_payments_page",
+                autospec=True,
+                side_effect=[
+                    ({"activated": True}, payloads),
+                    ({"activated": True}, []),
+                    ShopifyUserError("transactions denied"),
+                ],
+            ),
+            patch.object(
+                type(self.instance), "_import_disputes", autospec=True
+            ) as import_disputes,
+        ):
+            payout_ids = self.instance._job_import_payouts()
+
+        self.assertEqual(self.instance.shopify_payments_state, "unavailable")
+        payouts = self.env["shopify.payout"].search(
+            [("instance_id", "=", self.instance.id)]
+        )
+        self.assertEqual(payouts.ids, payout_ids)
+        self.assertEqual(payouts.shopify_id, payloads[0]["id"])
+        import_disputes.assert_not_called()
+
+    def test_transaction_access_denied_preserves_existing_payout(self):
+        payout = self._payout("202", "202")
+        payload = {
+            "id": payout.shopify_id,
+            "legacyResourceId": "202",
+            "status": "SCHEDULED",
+            "net": {"amount": "0.00", "currencyCode": self.currency.name},
+        }
+        with patch.object(
+            type(self.instance),
+            "_payments_page",
+            autospec=True,
+            side_effect=[
+                ({"activated": True}, [payload]),
+                ShopifyUserError("transactions denied"),
+            ],
+        ):
+            self.assertEqual(self.instance._job_import_payouts(), [])
+
+        self.assertEqual(self.instance.shopify_payments_state, "unavailable")
+        self.assertEqual(payout.payout_status, "PAID")
+        self.assertEqual(payout.net_exact, "97.00")
 
     def test_currency_and_payout_identity_errors_are_typed(self):
         with self.assertRaisesRegex(PayoutPlanningError, "no currency record"):
