@@ -25,6 +25,12 @@ class ShopifyInstancePosConfiguration(models.Model):
     pos_auto_fulfill = fields.Boolean(
         string="Validate POS Deliveries",
         default=True,
+        help=(
+            "Automatically validate deliveries for POS sales where the goods have "
+            "already been handed to the customer. This can create negative stock "
+            "if Odoo has insufficient inventory. Disable to review availability "
+            "and validate deliveries manually."
+        ),
     )
     pos_rounding_product_id = fields.Many2one(
         "product.product",
@@ -180,7 +186,6 @@ class ShopifyOrderPosBinding(models.Model):
             [
                 ("instance_id", "=", instance.id),
                 ("shopify_id", "=", location_id),
-                ("active", "=", True),
             ],
             limit=1,
         )
@@ -254,9 +259,9 @@ class ShopifyOrderPosBinding(models.Model):
             "product_id": product.id,
             "name": self.env._("Shopify POS cash rounding"),
             "product_uom_qty": 1,
-            "product_uom_id": product.uom_id.id,
+            "product_uom": product.uom_id.id,
             "price_unit": format(amount, "f"),
-            "tax_ids": [Command.clear()],
+            "tax_id": [Command.clear()],
             "shopify_pos_rounding": True,
         }
         if line:
@@ -299,6 +304,7 @@ class ShopifyOrderPosBinding(models.Model):
         return result
 
     def _validate_pos_deliveries(self, sale_order):
+        """Record immediate POS handovers even when Odoo stock is insufficient."""
         pickings = sale_order.picking_ids.filtered(
             lambda picking: (
                 picking.state not in ("done", "cancel")

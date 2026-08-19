@@ -21,13 +21,13 @@ Shopify Connector POS
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fconnector--shopify-lightgray.png?logo=github
-    :target: https://github.com/OCA/connector-shopify/tree/19.0/shopify_connector_pos
+    :target: https://github.com/OCA/connector-shopify/tree/18.0/shopify_connector_pos
     :alt: OCA/connector-shopify
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/connector-shopify-19-0/connector-shopify-19-0-shopify_connector_pos
+    :target: https://translation.odoo-community.org/projects/connector-shopify-18-0/connector-shopify-18-0-shopify_connector_pos
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
-    :target: https://runboat.odoo-community.org/builds?repo=OCA/connector-shopify&target_branch=19.0
+    :target: https://runboat.odoo-community.org/builds?repo=OCA/connector-shopify&target_branch=18.0
     :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
@@ -51,6 +51,13 @@ Install the module after the core connector. Enable POS on each relevant
 Shopify instance and choose whether eligible orders are confirmed and
 fulfilled automatically.
 
+**Validate POS Deliveries** is enabled by default. Use it for sales
+where the goods have already been handed to the customer at the POS. It
+validates the full delivery quantity even when Odoo has insufficient
+stock, which can create negative stock. Disable this option if
+availability must be reviewed before validating deliveries manually in
+Odoo.
+
 Map every Shopify retail location to its POS warehouse. Configure a
 service product and account for cash-rounding differences where the shop
 uses cash rounding.
@@ -72,7 +79,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/connector-shopify/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/connector-shopify/issues/new?body=module:%20shopify_connector_pos%0Aversion:%2019.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/connector-shopify/issues/new?body=module:%20shopify_connector_pos%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -83,6 +90,13 @@ Authors
 -------
 
 * Sawir Studio
+
+Contributors
+------------
+
+- `Binhex <https://www.binhex.cloud/>`__:
+
+  - Oliver Garcia
 
 Maintainers
 -----------
@@ -97,6 +111,6 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
-This module is part of the `OCA/connector-shopify <https://github.com/OCA/connector-shopify/tree/19.0/shopify_connector_pos>`_ project on GitHub.
+This module is part of the `OCA/connector-shopify <https://github.com/OCA/connector-shopify/tree/18.0/shopify_connector_pos>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.

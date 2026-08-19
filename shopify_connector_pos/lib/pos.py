@@ -4,20 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
-try:
-    from odoo.addons.shopify_connector.lib.order import (
-        decimal_amount,
-        selected_money,
-        shopify_gid,
-    )
-except ModuleNotFoundError as exc:
-    if exc.name != "odoo":
-        raise
-    from shopify_connector.lib.order import (
-        decimal_amount,
-        selected_money,
-        shopify_gid,
-    )
+from odoo.addons.shopify_connector.lib.order import (
+    decimal_amount,
+    selected_money,
+    shopify_gid,
+)
 
 
 def selected_cash_rounding(order: dict[str, Any], *, use_presentment: bool):
