@@ -5,6 +5,7 @@ import requests
 from odoo.tests.common import TransactionCase
 
 from odoo.addons.shopify_connector.lib.client import (
+    ShopifyAccessDenied,
     ShopifyClient,
     ShopifyServerError,
     ShopifyThrottled,
@@ -125,6 +126,34 @@ class TestShopifyLibClient(TransactionCase):
         with self.assertRaises(ShopifyServerError) as caught:
             client.execute("query { shop { name } }")
         assert "secret-token" not in str(caught.exception)
+
+    def test_access_denied_errors_expose_the_missing_scopes(self):
+        sleeps = []
+        client, _session = make_client(
+            [
+                FakeResponse(
+                    body={
+                        "errors": [
+                            {
+                                "message": (
+                                    "Access denied for draftOrders field. "
+                                    "Required access: `read_draft_orders` "
+                                    "access scope."
+                                ),
+                                "extensions": {"code": "ACCESS_DENIED"},
+                            }
+                        ]
+                    }
+                )
+            ],
+            sleeps,
+        )
+
+        with self.assertRaises(ShopifyAccessDenied) as caught:
+            client.execute("query { draftOrders { nodes { id } } }")
+
+        self.assertEqual(caught.exception.scopes, ("read_draft_orders",))
+        self.assertIn("Access denied for draftOrders field", str(caught.exception))
 
     def test_graphql_and_mutation_user_errors_are_typed(self):
         sleeps = []

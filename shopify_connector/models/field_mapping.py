@@ -3,7 +3,12 @@
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
-PRODUCT_FIELDS = (
+# Must stay a ``list``: Odoo only reflects selection labels into
+# ``ir.model.fields.selection`` for list-defined selections, and
+# ``fields.Selection._description_selection`` reads the labels from that table
+# as soon as a language is active. A tuple would expose an empty selection to
+# the web client, which crashes the selection field widget.
+PRODUCT_FIELDS = [
     ("name", "Name"),
     ("description", "Description"),
     ("price", "Price"),
@@ -13,7 +18,7 @@ PRODUCT_FIELDS = (
     ("customer_email", "Customer Email"),
     ("customer_phone", "Customer Phone"),
     ("customer_addresses", "Customer Addresses"),
-)
+]
 
 DEFAULT_PRODUCT_FIELD_OWNERS = {
     "name": "odoo",
@@ -49,10 +54,13 @@ class ShopifyFieldMapping(models.Model):
         default="odoo",
     )
 
-    _instance_field_unique = models.Constraint(
-        "UNIQUE(instance_id, field)",
-        "Each synchronized field can only be configured once per instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_field_unique",
+            "UNIQUE(instance_id, field)",
+            "Each synchronized field can only be configured once per instance.",
+        )
+    ]
 
 
 class ShopifyInstance(models.Model):
@@ -61,8 +69,22 @@ class ShopifyInstance(models.Model):
     field_mapping_ids = fields.One2many(
         "shopify.field.mapping",
         "instance_id",
-        string="Product Field Ownership",
+        string="Field Ownership",
         copy=True,
+    )
+    product_field_mapping_ids = fields.One2many(
+        "shopify.field.mapping",
+        "instance_id",
+        string="Product Field Ownership",
+        domain=[("field", "in", list(DEFAULT_PRODUCT_FIELD_OWNERS))],
+        copy=False,
+    )
+    customer_field_mapping_ids = fields.One2many(
+        "shopify.field.mapping",
+        "instance_id",
+        string="Customer Field Ownership",
+        domain=[("field", "in", list(DEFAULT_CUSTOMER_FIELD_OWNERS))],
+        copy=False,
     )
     product_create_if_missing = fields.Boolean(
         string="Create Missing Odoo Products",
@@ -93,10 +115,13 @@ class ShopifyInstance(models.Model):
         default=lambda self: self.env.company.currency_id,
         readonly=True,
     )
-    _product_pricelist_unique = models.Constraint(
-        "UNIQUE(product_pricelist_id)",
-        "Each Shopify instance must use its own product pricelist.",
-    )
+    _sql_constraints = [
+        (
+            "product_pricelist_unique",
+            "UNIQUE(product_pricelist_id)",
+            "Each Shopify instance must use its own product pricelist.",
+        )
+    ]
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -31,10 +31,13 @@ class ShopifyWebhookEvent(models.Model):
     )
     error_message = fields.Text(readonly=True)
 
-    _instance_webhook_id_unique = models.Constraint(
-        "UNIQUE(instance_id, webhook_id)",
-        "This Shopify webhook has already been received.",
-    )
+    _sql_constraints = [
+        (
+            "instance_webhook_id_unique",
+            "UNIQUE(instance_id, webhook_id)",
+            "This Shopify webhook has already been received.",
+        )
+    ]
 
     def _enqueue_dispatch(self):
         for event in self:

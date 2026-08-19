@@ -1,4 +1,4 @@
-The core Shopify connector links any number of Shopify stores to Odoo 19
+The core Shopify connector links any number of Shopify stores to Odoo 18
 Community through company-scoped binding records. It synchronizes products,
 inventory, customers, orders, returns, refunds, and fulfillment through the
 GraphQL Admin API.

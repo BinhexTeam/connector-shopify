@@ -184,10 +184,13 @@ class ShopifyOrderLine(models.Model):
     is_shipping = fields.Boolean(readonly=True)
     is_gift_card = fields.Boolean(readonly=True)
 
-    _instance_sale_line_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo order line can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_sale_line_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo order line can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains("instance_id", "order_binding_id", "odoo_id")
     def _check_line_scope(self):
@@ -269,10 +272,13 @@ class ShopifyRefundLine(models.Model):
     tax = fields.Char(readonly=True)
     restock_type = fields.Char(readonly=True)
 
-    _refund_line_unique = models.Constraint(
-        "UNIQUE(refund_id, shopify_id)",
-        "A refund line can only be imported once.",
-    )
+    _sql_constraints = [
+        (
+            "refund_line_unique",
+            "UNIQUE(refund_id, shopify_id)",
+            "A refund line can only be imported once.",
+        )
+    ]
 
 
 class ShopifyReturn(models.Model):
@@ -345,10 +351,13 @@ class ShopifyTaxMapping(models.Model):
         ondelete="restrict",
     )
 
-    _mapping_unique = models.Constraint(
-        "UNIQUE(instance_id, rate, country_id, price_included)",
-        "This Shopify tax combination is already mapped.",
-    )
+    _sql_constraints = [
+        (
+            "mapping_unique",
+            "UNIQUE(instance_id, rate, country_id, price_included)",
+            "This Shopify tax combination is already mapped.",
+        )
+    ]
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -406,10 +415,13 @@ class ShopifyGatewayJournal(models.Model):
         ondelete="restrict",
     )
 
-    _gateway_unique = models.Constraint(
-        "UNIQUE(instance_id, gateway)",
-        "This Shopify gateway already has a journal mapping.",
-    )
+    _sql_constraints = [
+        (
+            "gateway_unique",
+            "UNIQUE(instance_id, gateway)",
+            "This Shopify gateway already has a journal mapping.",
+        )
+    ]
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -439,10 +451,13 @@ class ShopifyGatewayPayment(models.Model):
     gateway = fields.Char(required=True)
     amount = fields.Char(required=True)
 
-    _transaction_unique = models.Constraint(
-        "UNIQUE(instance_id, transaction_shopify_id)",
-        "This Shopify payment transaction has already been registered.",
-    )
+    _sql_constraints = [
+        (
+            "transaction_unique",
+            "UNIQUE(instance_id, transaction_shopify_id)",
+            "This Shopify payment transaction has already been registered.",
+        )
+    ]
 
     @api.constrains("instance_id", "order_binding_id", "payment_id")
     def _check_payment_scope(self):

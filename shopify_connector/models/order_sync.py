@@ -17,6 +17,7 @@ from ..graphql.order import (
     orders_bulk_query,
 )
 from ..lib.bulk import ShopifyBulkRunner
+from ..lib.client import ShopifyAccessDenied
 from ..lib.order import (
     decimal_amount,
     line_diffs,
@@ -164,10 +165,18 @@ class ShopifyInstanceOrderSync(models.Model):
         after = None
         count = 0
         while True:
-            data = self._shopify_client().execute(
-                DRAFT_ORDERS_QUERY,
-                {"after": after, "query": " ".join(query_terms) or None},
-            )
+            try:
+                data = self._shopify_client().execute(
+                    DRAFT_ORDERS_QUERY,
+                    {"after": after, "query": " ".join(query_terms) or None},
+                )
+            except ShopifyAccessDenied as exc:
+                # Draft orders need the read_draft_orders scope. Skip them
+                # instead of failing the whole order import.
+                self._log_missing_scope(
+                    "draft_order", exc, expected_scopes=("read_draft_orders",)
+                )
+                return count
             connection = data.get("draftOrders") or {}
             for payload in connection.get("nodes") or []:
                 draft = normalize_order_payload(payload, is_draft=True)
@@ -250,10 +259,16 @@ class ShopifyOrderSync(models.Model):
         instance = self.env["shopify.instance"].sudo().browse(instance_id).exists()
         if not instance or not instance.active:
             return False
-        data = instance._shopify_client().execute(
-            DRAFT_ORDER_BY_ID_QUERY,
-            {"id": shopify_gid("DraftOrder", draft_id)},
-        )
+        try:
+            data = instance._shopify_client().execute(
+                DRAFT_ORDER_BY_ID_QUERY,
+                {"id": shopify_gid("DraftOrder", draft_id)},
+            )
+        except ShopifyAccessDenied as exc:
+            instance._log_missing_scope(
+                "draft_order", exc, expected_scopes=("read_draft_orders",)
+            )
+            return False
         payload = data.get("draftOrder")
         if not payload:
             return False
@@ -470,7 +485,7 @@ class ShopifyOrderSync(models.Model):
                 )
             write_values = values
             if sale_order.state not in ("draft", "sent"):
-                # Odoo 19 rejects these commercial fields on confirmed
+                # Odoo rejects these commercial fields on confirmed
                 # orders even when their values have not changed.
                 immutable_fields = {
                     "partner_id",
@@ -621,10 +636,10 @@ class ShopifyOrderSync(models.Model):
                 "product_id": product.id,
                 "name": line_data["title"] or product.display_name,
                 "product_uom_qty": line_data["quantity"],
-                "product_uom_id": product.uom_id.id,
+                "product_uom": product.uom_id.id,
                 "price_unit": selected_unit["amount"],
                 "discount": format(discount_percent, "f"),
-                "tax_ids": [Command.set(taxes.ids)],
+                "tax_id": [Command.set(taxes.ids)],
                 "shopify_line_id": line_data["id"],
                 "shopify_discount_amount": format(discount_amount, "f"),
                 "shopify_expected_total": selected_total["amount"],
@@ -723,10 +738,10 @@ class ShopifyOrderSync(models.Model):
                 "product_id": instance.delivery_product_id.id,
                 "name": shipping["title"],
                 "product_uom_qty": 1,
-                "product_uom_id": instance.delivery_product_id.uom_id.id,
+                "product_uom": instance.delivery_product_id.uom_id.id,
                 "price_unit": selected_original["amount"],
                 "discount": format(discount_percent, "f"),
-                "tax_ids": [Command.set(taxes.ids)],
+                "tax_id": [Command.set(taxes.ids)],
                 "shopify_line_id": identifier,
                 "shopify_expected_total": selected["amount"],
                 "shopify_is_shipping": True,

@@ -53,10 +53,13 @@ class ShopifyLocation(models.Model):
         index=True,
     )
 
-    _instance_odoo_location_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_location_id)",
-        "An Odoo stock location can only be mapped once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_odoo_location_unique",
+            "UNIQUE(instance_id, odoo_location_id)",
+            "An Odoo stock location can only be mapped once per Shopify instance.",
+        )
+    ]
 
     @api.depends("odoo_location_id")
     def _compute_is_mapped(self):
@@ -158,10 +161,13 @@ class ShopifyInventoryState(models.Model):
     last_shopify_quantity = fields.Integer(readonly=True)
     last_sync_date = fields.Datetime(readonly=True)
 
-    _inventory_state_unique = models.Constraint(
-        "UNIQUE(instance_id, variant_binding_id, location_binding_id)",
-        "Inventory state must be unique per instance, variant, and location.",
-    )
+    _sql_constraints = [
+        (
+            "inventory_state_unique",
+            "UNIQUE(instance_id, variant_binding_id, location_binding_id)",
+            "Inventory state must be unique per instance, variant, and location.",
+        )
+    ]
 
     @api.constrains("instance_id", "variant_binding_id", "location_binding_id")
     def _check_inventory_state_scope(self):

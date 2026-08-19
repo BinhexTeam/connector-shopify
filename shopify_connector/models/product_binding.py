@@ -74,10 +74,13 @@ class ShopifyProductTemplate(models.Model):
         string="Collections",
     )
 
-    _instance_odoo_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo product can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_odoo_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo product can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains("instance_id", "odoo_id")
     def _check_product_company(self):
@@ -129,10 +132,13 @@ class ShopifyProductVariant(models.Model):
     )
     image_checksum = fields.Char(readonly=True, copy=False)
 
-    _instance_odoo_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo variant can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_odoo_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo variant can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains("instance_id", "template_binding_id", "odoo_id")
     def _check_template_binding(self):
@@ -184,10 +190,13 @@ class ShopifyProductImage(models.Model):
     source_url = fields.Char(readonly=True)
     image_checksum = fields.Char(readonly=True, copy=False)
 
-    _instance_odoo_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo image can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_odoo_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo image can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains(
         "instance_id",

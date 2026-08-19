@@ -1,10 +1,13 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from odoo import SUPERUSER_ID
+from odoo.tests import tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.addons.shopify_connector.lib.client import ShopifyAccessDenied
 
 
+@tagged("post_install", "-at_install")
 class TestShopifyOrderSync(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls):
@@ -383,3 +386,24 @@ class TestShopifyOrderSync(AccountTestInvoicingCommon):
         self.assertEqual(len(refund), 1)
         self.assertEqual(refund.move_id.move_type, "out_refund")
         self.assertEqual(refund.move_id.state, "posted")
+
+    def test_draft_orders_are_skipped_when_the_scope_is_missing(self):
+        client = Mock()
+        client.execute.side_effect = ShopifyAccessDenied(
+            "Access denied for draftOrders field.",
+            scopes=("read_draft_orders",),
+        )
+
+        with patch.object(type(self.instance), "_shopify_client", return_value=client):
+            queued = self.instance._queue_draft_orders()
+
+        self.assertEqual(queued, 0)
+        log = self.env["shopify.log"].search(
+            [
+                ("instance_id", "=", self.instance.id),
+                ("entity", "=", "draft_order"),
+            ]
+        )
+        self.assertEqual(len(log), 1)
+        self.assertEqual(log.level, "warning")
+        self.assertIn("read_draft_orders", log.message)

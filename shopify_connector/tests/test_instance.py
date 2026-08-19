@@ -2,6 +2,12 @@ from unittest.mock import Mock, patch
 
 from odoo.tests.common import TransactionCase
 
+from ..lib.operability import REQUIRED_ADMIN_SCOPES
+from ..models.field_mapping import (
+    DEFAULT_CUSTOMER_FIELD_OWNERS,
+    DEFAULT_PRODUCT_FIELD_OWNERS,
+    PRODUCT_FIELDS,
+)
 from ..models.instance import REQUIRED_WEBHOOK_TOPICS
 from .common import assert_shopify_models_have_company_rules
 
@@ -19,19 +25,34 @@ class TestShopifyInstance(TransactionCase):
             }
         )
 
-    def test_connection_marks_instance_connected(self):
-        client = Mock()
-        client.execute.return_value = {
+    def _shop_payload(self):
+        return {
             "shop": {
                 "name": "Test Shop",
                 "currencyCode": self.instance.company_id.currency_id.name,
             }
         }
+
+    @staticmethod
+    def _scopes_payload(handles):
+        return {
+            "currentAppInstallation": {
+                "accessScopes": [{"handle": handle} for handle in handles]
+            }
+        }
+
+    def test_connection_marks_instance_connected(self):
+        client = Mock()
+        client.execute.side_effect = [
+            self._shop_payload(),
+            self._scopes_payload(REQUIRED_ADMIN_SCOPES),
+        ]
         with patch.object(type(self.instance), "_shopify_client", return_value=client):
             action = self.instance.action_test_connection()
 
         self.assertEqual(self.instance.state, "connected")
         self.assertEqual(action["tag"], "display_notification")
+        self.assertEqual(action["params"]["type"], "success")
         self.assertEqual(
             self.env["shopify.log"].search_count(
                 [
@@ -41,6 +62,28 @@ class TestShopifyInstance(TransactionCase):
             ),
             1,
         )
+
+    def test_connection_warns_about_missing_access_scopes(self):
+        client = Mock()
+        granted = set(REQUIRED_ADMIN_SCOPES) - {"read_draft_orders"}
+        client.execute.side_effect = [
+            self._shop_payload(),
+            self._scopes_payload(sorted(granted)),
+        ]
+        with patch.object(type(self.instance), "_shopify_client", return_value=client):
+            action = self.instance.action_test_connection()
+
+        self.assertEqual(self.instance.state, "connected")
+        self.assertEqual(action["params"]["type"], "warning")
+        self.assertIn("read_draft_orders", action["params"]["message"])
+        warning = self.env["shopify.log"].search(
+            [
+                ("instance_id", "=", self.instance.id),
+                ("level", "=", "warning"),
+            ]
+        )
+        self.assertEqual(len(warning), 1)
+        self.assertIn("read_draft_orders", warning.message)
 
     def test_repair_creates_all_missing_subscriptions(self):
         client = Mock()
@@ -117,6 +160,27 @@ class TestShopifyInstance(TransactionCase):
             self.env["shopify.product.template"].search(
                 [("instance_id", "=", duplicate.id)]
             )
+        )
+
+    def test_field_ownership_selection_is_translated_for_the_client(self):
+        mapping = self.env["shopify.field.mapping"].with_context(lang="en_US")
+
+        selection = mapping.fields_get(["field"])["field"]["selection"]
+
+        self.assertEqual(
+            [value for value, __ in selection],
+            [value for value, __ in PRODUCT_FIELDS],
+        )
+        self.assertTrue(all(label for __, label in selection))
+
+    def test_field_ownership_lists_are_split_per_page(self):
+        self.assertEqual(
+            set(self.instance.product_field_mapping_ids.mapped("field")),
+            set(DEFAULT_PRODUCT_FIELD_OWNERS),
+        )
+        self.assertEqual(
+            set(self.instance.customer_field_mapping_ids.mapped("field")),
+            set(DEFAULT_CUSTOMER_FIELD_OWNERS),
         )
 
     def test_archived_instance_job_returns_before_processing(self):

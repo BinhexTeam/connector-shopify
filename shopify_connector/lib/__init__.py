@@ -1,6 +1,7 @@
 from .bulk import ShopifyBulkError, ShopifyBulkRunner
 from .client import (
     API_VERSION,
+    ShopifyAccessDenied,
     ShopifyClient,
     ShopifyError,
     ShopifyServerError,
@@ -58,6 +59,7 @@ __all__ = [
     "API_VERSION",
     "ShopifyBulkError",
     "ShopifyBulkRunner",
+    "ShopifyAccessDenied",
     "ShopifyClient",
     "ShopifyError",
     "ShopifyServerError",
@@ -102,9 +104,15 @@ __all__ = [
     "shopify_gid",
     "verify_webhook_hmac",
 ]
-from .operability import missing_scopes, scope_handles, state_count_label
+from .operability import (
+    REQUIRED_ADMIN_SCOPES,
+    missing_scopes,
+    scope_handles,
+    state_count_label,
+)
 
 __all__ = [
+    "REQUIRED_ADMIN_SCOPES",
     "missing_scopes",
     "scope_handles",
     "state_count_label",

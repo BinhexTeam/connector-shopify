@@ -45,10 +45,13 @@ class ShopifyCustomer(models.Model):
         readonly=True,
     )
 
-    _instance_partner_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo customer can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_partner_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo customer can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains("instance_id", "odoo_id")
     def _check_customer_company(self):
@@ -95,10 +98,13 @@ class ShopifyCustomerAddress(models.Model):
     )
     is_default = fields.Boolean(readonly=True)
 
-    _instance_partner_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo address can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_partner_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo address can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains("instance_id", "customer_binding_id", "odoo_id")
     def _check_address_scope(self):
@@ -147,10 +153,13 @@ class ShopifyCompany(models.Model):
         string="Company Contacts",
     )
 
-    _instance_partner_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo company can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_partner_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo company can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains("instance_id", "odoo_id")
     def _check_b2b_company_scope(self):
@@ -288,10 +297,13 @@ class ShopifyCatalog(models.Model):
         index=True,
     )
 
-    _instance_pricelist_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_pricelist_id)",
-        "An Odoo pricelist can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_pricelist_unique",
+            "UNIQUE(instance_id, odoo_pricelist_id)",
+            "An Odoo pricelist can only be linked once per Shopify instance.",
+        )
+    ]
 
 
 class ResPartnerCategoryShopify(models.Model):
@@ -304,10 +316,13 @@ class ResPartnerCategoryShopify(models.Model):
         help="Company scope for categories created from Shopify tags.",
     )
 
-    _shopify_company_name_unique = models.Constraint(
-        "UNIQUE(name, shopify_company_id)",
-        "A Shopify tag category must be unique per company.",
-    )
+    _sql_constraints = [
+        (
+            "shopify_company_name_unique",
+            "UNIQUE(name, shopify_company_id)",
+            "A Shopify tag category must be unique per company.",
+        )
+    ]
 
 
 class ShopifyInstanceCustomerConfig(models.Model):

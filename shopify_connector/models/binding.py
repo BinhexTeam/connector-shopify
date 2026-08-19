@@ -39,7 +39,10 @@ class ShopifyBindingMixin(models.AbstractModel):
     )
     error_message = fields.Text(readonly=True)
 
-    _instance_gid_unique = models.Constraint(
-        "UNIQUE(instance_id, shopify_id)",
-        "A Shopify ID can only be bound once per instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_gid_unique",
+            "UNIQUE(instance_id, shopify_id)",
+            "A Shopify ID can only be bound once per instance.",
+        )
+    ]

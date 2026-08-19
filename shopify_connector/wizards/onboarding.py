@@ -8,20 +8,10 @@ from ..graphql import (
     CURRENT_APP_SCOPES_QUERY,
     SHOP_TAX_SETTINGS_QUERY,
 )
-from ..lib.operability import missing_scopes, scope_handles
-
-REQUIRED_ADMIN_SCOPES = (
-    "read_customers",
-    "read_draft_orders",
-    "read_inventory",
-    "read_locations",
-    "read_merchant_managed_fulfillment_orders",
-    "read_orders",
-    "read_products",
-    "write_customers",
-    "write_inventory",
-    "write_merchant_managed_fulfillment_orders",
-    "write_products",
+from ..lib.operability import (
+    REQUIRED_ADMIN_SCOPES,
+    missing_scopes,
+    scope_handles,
 )
 
 

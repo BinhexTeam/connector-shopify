@@ -4,12 +4,18 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 from ..graphql import (
+    CURRENT_APP_SCOPES_QUERY,
     SHOP_QUERY,
     WEBHOOK_SUBSCRIPTION_CREATE,
     WEBHOOK_SUBSCRIPTION_UPDATE,
     WEBHOOK_SUBSCRIPTIONS_QUERY,
 )
 from ..lib.client import API_VERSION, ShopifyClient, ShopifyError
+from ..lib.operability import (
+    REQUIRED_ADMIN_SCOPES,
+    missing_scopes,
+    scope_handles,
+)
 
 REQUIRED_WEBHOOK_TOPICS = (
     "APP_UNINSTALLED",
@@ -86,10 +92,13 @@ class ShopifyInstance(models.Model):
         copy=False,
     )
 
-    _company_url_unique = models.Constraint(
-        "UNIQUE(company_id, shop_url)",
-        "A shop domain can only be configured once per company.",
-    )
+    _sql_constraints = [
+        (
+            "company_url_unique",
+            "UNIQUE(company_id, shop_url)",
+            "A shop domain can only be configured once per company.",
+        )
+    ]
 
     @api.constrains("shop_url")
     def _check_shop_url(self):
@@ -245,16 +254,79 @@ class ShopifyInstance(models.Model):
             message=self.env._("Connected to Shopify shop %s.", shop_name),
             record=self,
         )
+        missing = self._missing_admin_scopes()
+        if not missing:
+            return {
+                "type": "ir.actions.client",
+                "tag": "display_notification",
+                "params": {
+                    "title": self.env._("Connection successful"),
+                    "message": self.env._("Connected to Shopify shop %s.", shop_name),
+                    "type": "success",
+                    "sticky": False,
+                },
+            }
+        message = self.env._(
+            "Connected to Shopify shop %(shop)s, but the app is missing the "
+            "%(scopes)s access scope(s). The matching synchronizations are "
+            "skipped until the scopes are granted and the app reinstalled.",
+            shop=shop_name,
+            scopes=", ".join(missing),
+        )
+        self._write_log(
+            entity="instance",
+            direction="import",
+            level="warning",
+            message=message,
+            record=self,
+        )
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
-                "title": self.env._("Connection successful"),
-                "message": self.env._("Connected to Shopify shop %s.", shop_name),
-                "type": "success",
-                "sticky": False,
+                "title": self.env._("Missing Shopify access scopes"),
+                "message": message,
+                "type": "warning",
+                "sticky": True,
             },
         }
+
+    def _missing_admin_scopes(self):
+        """Return the required Admin API scopes the app does not grant."""
+        self.ensure_one()
+        try:
+            data = self._shopify_client().execute(CURRENT_APP_SCOPES_QUERY)
+        except ShopifyError:
+            # Never fail a working connection because the scope probe itself
+            # was rejected; the individual jobs still report their denials.
+            return ()
+        return missing_scopes(scope_handles(data), REQUIRED_ADMIN_SCOPES)
+
+    def _log_missing_scope(self, entity, exc, expected_scopes=()):
+        """Log a Shopify access-scope denial without failing the whole flow."""
+        self.ensure_one()
+        scopes = ", ".join(getattr(exc, "scopes", ()) or expected_scopes)
+        if scopes:
+            message = self.env._(
+                "Shopify denied access (%(error)s). Grant the %(scopes)s access "
+                "scope(s) to the app and test the connection again.",
+                error=exc,
+                scopes=scopes,
+            )
+        else:
+            message = self.env._(
+                "Shopify denied access (%(error)s). Review the app access scopes "
+                "and test the connection again.",
+                error=exc,
+            )
+        self._write_log(
+            entity=entity,
+            direction="import",
+            level="warning",
+            message=message,
+            record=self,
+        )
+        return message
 
     def _webhook_callback_url(self):
         self.ensure_one()

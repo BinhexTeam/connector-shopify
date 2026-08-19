@@ -24,4 +24,3 @@ repo_slug: connector-shopify
 repo_website: https://github.com/OCA/connector-shopify
 use_pyproject_toml: true
 use_ruff: true
-

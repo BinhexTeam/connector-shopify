@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 from collections.abc import Callable, Mapping
 from typing import Any
@@ -21,6 +22,14 @@ class ShopifyThrottled(ShopifyError):
 
 class ShopifyUserError(ShopifyError):
     """Raised for invalid requests and GraphQL user errors."""
+
+
+class ShopifyAccessDenied(ShopifyUserError):
+    """Raised when the access token lacks the scope a field requires."""
+
+    def __init__(self, message, *, scopes=()):
+        super().__init__(message)
+        self.scopes = tuple(scopes)
 
 
 class ShopifyServerError(ShopifyError):
@@ -133,7 +142,7 @@ class ShopifyClient:
                 self._backoff(attempt)
                 continue
             if errors:
-                raise ShopifyUserError(self._format_graphql_errors(errors))
+                self._raise_graphql_error(errors)
 
             data = body.get("data")
             if not isinstance(data, dict):
@@ -196,6 +205,45 @@ class ShopifyClient:
             if isinstance(error, dict)
         ]
         return "; ".join(messages) or "Shopify returned a GraphQL error."
+
+    @classmethod
+    def _raise_graphql_error(cls, errors: Any) -> None:
+        message = cls._format_graphql_errors(errors)
+        if cls._is_access_denied(errors):
+            raise ShopifyAccessDenied(
+                message, scopes=cls._required_access_scopes(errors)
+            )
+        raise ShopifyUserError(message)
+
+    @classmethod
+    def _is_access_denied(cls, errors: Any) -> bool:
+        return any(
+            str(cls._error_code(error)).upper() == "ACCESS_DENIED"
+            or str(error.get("message") or "").lower().startswith("access denied")
+            for error in (errors if isinstance(errors, list) else [])
+            if isinstance(error, dict)
+        )
+
+    @classmethod
+    def _required_access_scopes(cls, errors: Any) -> tuple[str, ...]:
+        handles: set[str] = set()
+        for error in errors if isinstance(errors, list) else []:
+            if not isinstance(error, dict):
+                continue
+            extensions = error.get("extensions")
+            required = (
+                extensions.get("requiredAccess")
+                if isinstance(extensions, dict)
+                else None
+            )
+            text = f"{error.get('message') or ''} {required or ''}"
+            handles.update(re.findall(r"\b(?:read|write)_[a-z0-9_]+\b", text))
+        return tuple(sorted(handles))
+
+    @staticmethod
+    def _error_code(error: dict) -> Any:
+        extensions = error.get("extensions")
+        return extensions.get("code") if isinstance(extensions, dict) else None
 
     @classmethod
     def _collect_user_errors(cls, value: Any) -> list[str]:

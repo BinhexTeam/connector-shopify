@@ -131,10 +131,13 @@ class ShopifyFulfillmentOrderLine(models.Model):
     total_quantity = fields.Integer(readonly=True)
     remaining_quantity = fields.Integer(readonly=True)
 
-    _fulfillment_order_line_unique = models.Constraint(
-        "UNIQUE(fulfillment_order_id, shopify_id)",
-        "A fulfillment-order line can only be imported once.",
-    )
+    _sql_constraints = [
+        (
+            "fulfillment_order_line_unique",
+            "UNIQUE(fulfillment_order_id, shopify_id)",
+            "A fulfillment-order line can only be imported once.",
+        )
+    ]
 
     @api.constrains("fulfillment_order_id", "order_line_binding_id")
     def _check_fulfillment_line_scope(self):
@@ -209,10 +212,13 @@ class ShopifyFulfillment(models.Model):
     tracking_url = fields.Char(readonly=True)
     raw_payload = fields.Json(readonly=True)
 
-    _instance_idempotency_unique = models.Constraint(
-        "UNIQUE(instance_id, idempotency_key)",
-        "This Odoo delivery was already sent to Shopify.",
-    )
+    _sql_constraints = [
+        (
+            "instance_idempotency_unique",
+            "UNIQUE(instance_id, idempotency_key)",
+            "This Odoo delivery was already sent to Shopify.",
+        )
+    ]
 
     @api.constrains(
         "instance_id", "order_binding_id", "fulfillment_order_ids", "picking_id"
@@ -289,10 +295,13 @@ class ShopifyCarrierMapping(models.Model):
         help="Company string sent in Shopify tracking information.",
     )
 
-    _instance_carrier_unique = models.Constraint(
-        "UNIQUE(instance_id, carrier_id)",
-        "A delivery carrier can only be mapped once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_carrier_unique",
+            "UNIQUE(instance_id, carrier_id)",
+            "A delivery carrier can only be mapped once per Shopify instance.",
+        )
+    ]
 
     @api.model_create_multi
     def create(self, vals_list):

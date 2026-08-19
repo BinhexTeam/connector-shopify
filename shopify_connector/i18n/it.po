@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0\n"
+"Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -3629,11 +3629,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopify_connector/models/customer_sync.py:0
 msgid "Shopify Company Contact"
-msgstr ""
-
-#. module: shopify_connector
-#: model:res.groups.privilege,name:shopify_connector.privilege_shopify
-msgid "Shopify Connector"
 msgstr ""
 
 #. module: shopify_connector

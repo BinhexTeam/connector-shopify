@@ -2,8 +2,8 @@ from unittest.mock import Mock, patch
 
 from odoo.tests.common import TransactionCase
 
+from ..lib.operability import REQUIRED_ADMIN_SCOPES
 from ..models.instance import REQUIRED_WEBHOOK_TOPICS
-from ..wizards.onboarding import REQUIRED_ADMIN_SCOPES
 
 
 class TestShopifyOnboarding(TransactionCase):
@@ -16,6 +16,7 @@ class TestShopifyOnboarding(TransactionCase):
                     "currencyCode": self.env.company.currency_id.name,
                 }
             },
+            {"currentAppInstallation": {"accessScopes": [{"handle": "read_orders"}]}},
             {"currentAppInstallation": {"accessScopes": [{"handle": "read_orders"}]}},
         ]
         wizard = self.env["shopify.instance.wizard"].create(
@@ -52,6 +53,13 @@ class TestShopifyOnboarding(TransactionCase):
                 "shop": {
                     "name": "Import Graph Shop",
                     "currencyCode": self.env.company.currency_id.name,
+                }
+            },
+            {
+                "currentAppInstallation": {
+                    "accessScopes": [
+                        {"handle": handle} for handle in REQUIRED_ADMIN_SCOPES
+                    ]
                 }
             },
             {

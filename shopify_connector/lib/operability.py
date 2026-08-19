@@ -4,6 +4,21 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
+#: Admin API access scopes the connector needs to synchronize every entity.
+REQUIRED_ADMIN_SCOPES = (
+    "read_customers",
+    "read_draft_orders",
+    "read_inventory",
+    "read_locations",
+    "read_merchant_managed_fulfillment_orders",
+    "read_orders",
+    "read_products",
+    "write_customers",
+    "write_inventory",
+    "write_merchant_managed_fulfillment_orders",
+    "write_products",
+)
+
 
 def scope_handles(payload: dict) -> set[str]:
     """Extract normalized access-scope handles from Shopify's response."""
