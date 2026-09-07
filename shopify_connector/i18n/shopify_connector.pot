@@ -188,13 +188,11 @@ msgstr ""
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_company_location_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_customer_address_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_customer_instance_gid_unique
-#: model:ir.model.constraint,message:shopify_connector.constraint_shopify_dispute_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_fulfillment_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_fulfillment_order_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_location_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_order_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_order_line_instance_gid_unique
-#: model:ir.model.constraint,message:shopify_connector.constraint_shopify_payout_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_product_image_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_product_template_instance_gid_unique
 #: model:ir.model.constraint,message:shopify_connector.constraint_shopify_product_variant_instance_gid_unique
@@ -771,6 +769,15 @@ msgstr ""
 #. module: shopify_connector
 #. odoo-python
 #: code:addons/shopify_connector/models/instance.py:0
+msgid ""
+"Connected to Shopify shop %(shop)s, but the app is missing the %(scopes)s "
+"access scope(s). The matching synchronizations are skipped until the scopes "
+"are granted and the app reinstalled."
+msgstr ""
+
+#. module: shopify_connector
+#. odoo-python
+#: code:addons/shopify_connector/models/instance.py:0
 msgid "Connected to Shopify shop %s."
 msgstr ""
 
@@ -843,11 +850,6 @@ msgstr ""
 #. module: shopify_connector
 #: model_terms:ir.ui.view,arch_db:shopify_connector.shopify_order_view_form
 msgid "Create Tax Mapping"
-msgstr ""
-
-#. module: shopify_connector
-#: model:ir.model,website_form_label:shopify_connector.model_res_partner
-msgid "Create a Customer"
 msgstr ""
 
 #. module: shopify_connector
@@ -980,6 +982,11 @@ msgid "Custom App Credentials"
 msgstr ""
 
 #. module: shopify_connector
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__customer_addresses
+msgid "Customer Addresses"
+msgstr ""
+
+#. module: shopify_connector
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_customer_address__customer_binding_id
 msgid "Customer Binding"
 msgstr ""
@@ -991,8 +998,24 @@ msgid "Customer Bindings"
 msgstr ""
 
 #. module: shopify_connector
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__customer_email
+msgid "Customer Email"
+msgstr ""
+
+#. module: shopify_connector
+#: model:ir.model.fields,field_description:shopify_connector.field_shopify_instance__customer_field_mapping_ids
 #: model_terms:ir.ui.view,arch_db:shopify_connector.shopify_instance_view_form
 msgid "Customer Field Ownership"
+msgstr ""
+
+#. module: shopify_connector
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__customer_name
+msgid "Customer Name"
+msgstr ""
+
+#. module: shopify_connector
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__customer_phone
+msgid "Customer Phone"
 msgstr ""
 
 #. module: shopify_connector
@@ -1188,6 +1211,11 @@ msgid "Delta"
 msgstr ""
 
 #. module: shopify_connector
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__description
+msgid "Description"
+msgstr ""
+
+#. module: shopify_connector
 #: model_terms:ir.ui.view,arch_db:shopify_connector.shopify_instance_view_form
 msgid "Detect and Import B2B"
 msgstr ""
@@ -1231,16 +1259,6 @@ msgid "Dispatch Shopify webhook %s"
 msgstr ""
 
 #. module: shopify_connector
-#: model:ir.model.fields,field_description:shopify_connector.field_product_image__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_product_pricelist_item__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_product_product__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_product_template__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_product_template_attribute_value__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_res_partner__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_res_partner_category__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_sale_order__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_sale_order_line__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_shopify_binding_mixin__display_name
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_carrier_mapping__display_name
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_catalog__display_name
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_collection__display_name
@@ -1272,8 +1290,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_return__display_name
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_tax_mapping__display_name
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_webhook_event__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_stock_picking__display_name
-#: model:ir.model.fields,field_description:shopify_connector.field_stock_quant__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -1357,7 +1373,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_company_location__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_customer__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_customer_address__state__error
-#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_dispute__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_fulfillment__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_fulfillment_order__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_instance__state__error
@@ -1365,7 +1380,6 @@ msgstr ""
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_log__level__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_order__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_order_line__state__error
-#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_payout__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_image__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_template__state__error
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_variant__state__error
@@ -1504,6 +1518,7 @@ msgid "Field"
 msgstr ""
 
 #. module: shopify_connector
+#: model:ir.model.fields,field_description:shopify_connector.field_shopify_instance__field_mapping_ids
 #: model_terms:ir.ui.view,arch_db:shopify_connector.shopify_instance_view_form
 msgid "Field Ownership"
 msgstr ""
@@ -1662,16 +1677,6 @@ msgid "Holds"
 msgstr ""
 
 #. module: shopify_connector
-#: model:ir.model.fields,field_description:shopify_connector.field_product_image__id
-#: model:ir.model.fields,field_description:shopify_connector.field_product_pricelist_item__id
-#: model:ir.model.fields,field_description:shopify_connector.field_product_product__id
-#: model:ir.model.fields,field_description:shopify_connector.field_product_template__id
-#: model:ir.model.fields,field_description:shopify_connector.field_product_template_attribute_value__id
-#: model:ir.model.fields,field_description:shopify_connector.field_res_partner__id
-#: model:ir.model.fields,field_description:shopify_connector.field_res_partner_category__id
-#: model:ir.model.fields,field_description:shopify_connector.field_sale_order__id
-#: model:ir.model.fields,field_description:shopify_connector.field_sale_order_line__id
-#: model:ir.model.fields,field_description:shopify_connector.field_shopify_binding_mixin__id
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_carrier_mapping__id
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_catalog__id
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_collection__id
@@ -1703,8 +1708,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_return__id
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_tax_mapping__id
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_webhook_event__id
-#: model:ir.model.fields,field_description:shopify_connector.field_stock_picking__id
-#: model:ir.model.fields,field_description:shopify_connector.field_stock_quant__id
 msgid "ID"
 msgstr ""
 
@@ -1732,6 +1735,7 @@ msgid "Image Checksum"
 msgstr ""
 
 #. module: shopify_connector
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__images
 #: model_terms:ir.ui.view,arch_db:shopify_connector.shopify_product_template_view_form
 msgid "Images"
 msgstr ""
@@ -2382,6 +2386,12 @@ msgid "Missing Scopes"
 msgstr ""
 
 #. module: shopify_connector
+#. odoo-python
+#: code:addons/shopify_connector/models/instance.py:0
+msgid "Missing Shopify access scopes"
+msgstr ""
+
+#. module: shopify_connector
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_order__missing_tax_country_id
 msgid "Missing Tax Country"
 msgstr ""
@@ -2414,6 +2424,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_instance_wizard_location__location_name
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_location__name
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_return__name
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__name
 msgid "Name"
 msgstr ""
 
@@ -2877,13 +2888,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_company_location__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_customer__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_customer_address__state__pending
-#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_dispute__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_fulfillment__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_fulfillment_order__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_location__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_order__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_order_line__state__pending
-#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_payout__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_image__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_template__state__pending
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_variant__state__pending
@@ -2976,6 +2985,11 @@ msgid "Presentment Unit Price"
 msgstr ""
 
 #. module: shopify_connector
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__price
+msgid "Price"
+msgstr ""
+
+#. module: shopify_connector
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_tax_mapping__price_included
 msgid "Price Included"
 msgstr ""
@@ -3020,7 +3034,7 @@ msgid "Product Create If Missing"
 msgstr ""
 
 #. module: shopify_connector
-#: model:ir.model.fields,field_description:shopify_connector.field_shopify_instance__field_mapping_ids
+#: model:ir.model.fields,field_description:shopify_connector.field_shopify_instance__product_field_mapping_ids
 msgid "Product Field Ownership"
 msgstr ""
 
@@ -4131,6 +4145,22 @@ msgstr ""
 
 #. module: shopify_connector
 #. odoo-python
+#: code:addons/shopify_connector/models/instance.py:0
+msgid ""
+"Shopify denied access (%(error)s). Grant the %(scopes)s access scope(s) to "
+"the app and test the connection again."
+msgstr ""
+
+#. module: shopify_connector
+#. odoo-python
+#: code:addons/shopify_connector/models/instance.py:0
+msgid ""
+"Shopify denied access (%(error)s). Review the app access scopes and test the"
+" connection again."
+msgstr ""
+
+#. module: shopify_connector
+#. odoo-python
 #: code:addons/shopify_connector/models/fulfillment_sync.py:0
 msgid "Shopify did not reassign the fulfillment order to location %s."
 msgstr ""
@@ -4454,6 +4484,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_fulfillment__fulfillment_status
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_fulfillment_order__fulfillment_status
 #: model:ir.model.fields,field_description:shopify_connector.field_shopify_product_template__status
+#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_field_mapping__field__status
 msgid "Status"
 msgstr ""
 
@@ -4523,13 +4554,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_company_location__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_customer__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_customer_address__state__synced
-#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_dispute__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_fulfillment__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_fulfillment_order__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_location__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_order__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_order_line__state__synced
-#: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_payout__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_image__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_template__state__synced
 #: model:ir.model.fields.selection,name:shopify_connector.selection__shopify_product_variant__state__synced
@@ -5160,24 +5189,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:shopify_connector.shopify_instance_view_form
 #: model_terms:ir.ui.view,arch_db:shopify_connector.shopify_instance_wizard_view_form
 msgid "example.myshopify.com"
-msgstr ""
-
-#. module: shopify_connector
-#. odoo-python
-#: code:addons/shopify_connector/models/order_sync.py:0
-msgid "gateway-"
-msgstr ""
-
-#. module: shopify_connector
-#. odoo-python
-#: code:addons/shopify_connector/models/order_sync.py:0
-msgid "id"
-msgstr ""
-
-#. module: shopify_connector
-#. odoo-python
-#: code:addons/shopify_connector/models/operability.py:0
-msgid "instance_id"
 msgstr ""
 
 #. module: shopify_connector
