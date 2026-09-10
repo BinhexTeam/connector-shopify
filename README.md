@@ -23,6 +23,7 @@ Available addons
 addon | version | maintainers | summary
 --- | --- | --- | ---
 [shopify_connector](shopify_connector/) | 18.0.1.0.0 |  | GraphQL-first Shopify commerce synchronization
+[shopify_connector_account](shopify_connector_account/) | 18.0.1.0.0 |  | Shopify Payments payouts, fees, disputes, and reconciliation
 
 [//]: # (end addons)
 
