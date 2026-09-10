@@ -129,9 +129,6 @@ msgstr ""
 
 #. module: shopify_connector_account
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_dispute__display_name
-#: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_gateway_payment__display_name
-#: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_instance__display_name
-#: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_order__display_name
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_payout__display_name
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_payout_transaction__display_name
 msgid "Display Name"
@@ -292,9 +289,6 @@ msgstr ""
 
 #. module: shopify_connector_account
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_dispute__id
-#: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_gateway_payment__id
-#: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_instance__id
-#: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_order__id
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_payout__id
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_payout_transaction__id
 msgid "ID"
@@ -645,6 +639,12 @@ msgid "Shopify gift card redemption"
 msgstr ""
 
 #. module: shopify_connector_account
+#. odoo-python
+#: code:addons/shopify_connector_account/models/payout_sync.py:0
+msgid "Shopify returned an invalid payments page cursor."
+msgstr ""
+
+#. module: shopify_connector_account
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_payout_transaction__source_id
 msgid "Source"
 msgstr ""
@@ -789,10 +789,4 @@ msgstr ""
 #. module: shopify_connector_account
 #: model:ir.model.fields,field_description:shopify_connector_account.field_shopify_payout__unmatched_count
 msgid "Unmatched Transactions"
-msgstr ""
-
-#. module: shopify_connector_account
-#. odoo-python
-#: code:addons/shopify_connector_account/models/payout_sync.py:0
-msgid "display_typetype"
 msgstr ""
