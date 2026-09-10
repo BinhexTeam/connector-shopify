@@ -14,6 +14,15 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: shopify_connector_pos
+#: model:ir.model.fields,help:shopify_connector_pos.field_shopify_instance__pos_auto_fulfill
+msgid ""
+"Automatically validate deliveries for POS sales where the goods have already"
+" been handed to the customer. This can create negative stock if Odoo has "
+"insufficient inventory. Disable to review availability and validate "
+"deliveries manually."
+msgstr ""
+
+#. module: shopify_connector_pos
 #: model_terms:ir.ui.view,arch_db:shopify_connector_pos.shopify_instance_pos_view_form
 msgid "Cash Rounding"
 msgstr ""
@@ -47,15 +56,6 @@ msgid "Confirm POS Orders"
 msgstr ""
 
 #. module: shopify_connector_pos
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_sale_order__display_name
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_sale_order_line__display_name
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_shopify_instance__display_name
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_shopify_location__display_name
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_shopify_order__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: shopify_connector_pos
 #: model_terms:ir.ui.view,arch_db:shopify_connector_pos.shopify_order_view_search_pos
 msgid "Errors"
 msgstr ""
@@ -69,15 +69,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopify_connector_pos/models/pos.py:0
 msgid "Exchange orders must use one Shopify instance."
-msgstr ""
-
-#. module: shopify_connector_pos
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_sale_order__id
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_sale_order_line__id
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_shopify_instance__id
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_shopify_location__id
-#: model:ir.model.fields,field_description:shopify_connector_pos.field_shopify_order__id
-msgid "ID"
 msgstr ""
 
 #. module: shopify_connector_pos
