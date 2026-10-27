@@ -36,10 +36,13 @@ class ShopifyProductImage(models.Model):
     source_url = fields.Char(readonly=True)
     image_checksum = fields.Char(readonly=True, copy=False)
 
-    _instance_odoo_unique = models.Constraint(
-        "UNIQUE(instance_id, odoo_id)",
-        "An Odoo image can only be linked once per Shopify instance.",
-    )
+    _sql_constraints = [
+        (
+            "instance_odoo_unique",
+            "UNIQUE(instance_id, odoo_id)",
+            "An Odoo image can only be linked once per Shopify instance.",
+        )
+    ]
 
     @api.constrains(
         "instance_id",
